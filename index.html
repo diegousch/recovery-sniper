@@ -5,13 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Recovery Sniper · Target Calculator</title>
 <style>
-@font-face {
-  font-family: 'Bebas Neue';
-  src: local('Impact'), local('Arial Narrow');
-  font-weight: 400;
-}
-</style>
-<style>
   :root {
     --bg: #080c10;
     --surface: #0d1318;
@@ -59,7 +52,7 @@
   }
 
   .sub {
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    font-family: 'Courier New', monospace;
     font-size: 11px;
     letter-spacing: 3px;
     color: var(--muted);
@@ -94,7 +87,7 @@
   .field { display: flex; flex-direction: column; gap: 5px; }
 
   .field-label {
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    font-family: 'Courier New', monospace;
     font-size: 12px;
     letter-spacing: 2px;
     color: var(--label);
@@ -107,7 +100,7 @@
 
   .prefix {
     position: absolute; left: 13px;
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    font-family: 'Courier New', monospace;
     font-size: 17px; color: var(--muted);
     pointer-events: none; z-index: 1;
   }
@@ -118,7 +111,7 @@
     border-radius: 10px;
     padding: 13px 36px 13px 30px;
     color: #fff;
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    font-family: 'Courier New', monospace;
     font-size: 22px;
     font-weight: 700;
     width: 100%;
@@ -135,6 +128,16 @@
   input:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(0,229,160,0.12);
+  }
+
+  .ask-real {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    margin-top: 4px;
+    min-height: 16px;
+    text-shadow: 0 0 8px rgba(0,229,160,0.4);
   }
 
   .clear-btn {
@@ -159,6 +162,11 @@
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 9px 13px; flex: 1;
+    transition: border-color 0.3s;
+  }
+  .commission-wrap.comm-off {
+    border-color: rgba(255,64,96,0.35);
+    background: rgba(255,64,96,0.04);
   }
 
   .comm-toggle {
@@ -179,7 +187,7 @@
   .comm-toggle input:checked + .comm-slider::before { transform: translateX(16px); }
 
   .comm-label {
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    font-family: 'Courier New', monospace;
     font-size: 12px; color: var(--label); white-space: nowrap;
     font-weight: 700;
   }
@@ -188,12 +196,96 @@
     background: rgba(255,64,96,0.08);
     border: 1px solid rgba(255,64,96,0.25);
     border-radius: 10px; padding: 9px 16px;
-    color: var(--danger); font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    color: var(--danger); font-family: 'Courier New', monospace;
     font-size: 12px; letter-spacing: 1px;
     cursor: pointer; transition: all 0.2s; white-space: nowrap;
   }
   .reset-btn:hover { background: rgba(255,64,96,0.16); }
 
+  /* ── CONFIRM DIALOG ── */
+  .dialog-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .dialog-overlay.show {
+    opacity: 1; pointer-events: all;
+  }
+
+  .dialog {
+    background: #0d1318;
+    border: 1px solid rgba(255,64,96,0.4);
+    border-radius: 18px;
+    padding: 28px 24px 22px;
+    max-width: 320px;
+    width: 90%;
+    box-shadow: 0 0 60px rgba(255,64,96,0.15);
+    transform: translateY(10px);
+    transition: transform 0.2s;
+    text-align: center;
+  }
+  .dialog-overlay.show .dialog {
+    transform: translateY(0);
+  }
+
+  .dialog-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+  }
+
+  .dialog-title {
+    font-family: 'Impact', 'Arial Narrow', 'Arial Black', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--danger);
+    margin-bottom: 10px;
+  }
+
+  .dialog-msg {
+    font-family: -apple-system, Arial, sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 22px;
+  }
+
+  .dialog-msg strong {
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .dialog-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .btn-cancel {
+    background: rgba(0,229,160,0.08);
+    border: 1px solid rgba(0,229,160,0.3);
+    border-radius: 10px; padding: 12px;
+    color: var(--accent);
+    font-family: 'Courier New', monospace;
+    font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-cancel:hover { background: rgba(0,229,160,0.16); }
+
+  .btn-confirm {
+    background: rgba(255,64,96,0.1);
+    border: 1px solid rgba(255,64,96,0.4);
+    border-radius: 10px; padding: 12px;
+    color: var(--danger);
+    font-family: 'Courier New', monospace;
+    font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-confirm:hover { background: rgba(255,64,96,0.22); }
+
+  /* ── TOTAL BADGE ── */
   .total-badge {
     background: rgba(0,229,160,0.05);
     border: 1px solid rgba(0,229,160,0.18);
@@ -205,26 +297,26 @@
   .total-col { display: flex; flex-direction: column; gap: 2px; }
 
   .total-label {
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    font-family: 'Courier New', monospace;
     font-size: 12px; letter-spacing: 2px;
     color: var(--label); text-transform: uppercase; font-weight: 700;
     text-shadow: 0 0 12px rgba(0,229,160,0.3);
   }
 
   .total-sub {
-    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
-    font-size: 12px; color: var(--label-dim);
+    font-family: -apple-system, Arial, sans-serif;
+    font-size: 11px; color: var(--label-dim);
   }
 
   .total-value {
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    font-family: 'Courier New', monospace;
     font-size: 26px; font-weight: 700; color: var(--accent);
   }
 
   .divider { border: none; border-top: 1px solid var(--border); margin: 0 0 14px; }
 
   .section-label {
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    font-family: 'Courier New', monospace;
     font-size: 12px; letter-spacing: 2px; color: var(--label);
     text-transform: uppercase; font-weight: 700;
     margin-bottom: 10px;
@@ -250,13 +342,13 @@
     font-family: 'Impact', 'Arial Narrow', 'Arial Black', sans-serif;
     font-size: 20px; letter-spacing: 2px; color: var(--danger); line-height: 1;
   }
-  .sl-sub { font-family: 'Courier New', 'Courier', ui-monospace, monospace; font-size: 10px; color: #00ffb3; margin-top: 1px; }
+  .sl-sub { font-family: 'Courier New', monospace; font-size: 10px; color: #00ffb3; margin-top: 1px; }
 
   .bid-price {
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    font-family: 'Courier New', monospace;
     font-size: 18px; font-weight: 700; color: #fff; text-align: right;
   }
-  .delta { font-family: 'Courier New', 'Courier', ui-monospace, monospace; font-size: 12px; text-align: right; margin-top: 1px; }
+  .delta { font-family: 'Courier New', monospace; font-size: 12px; text-align: right; margin-top: 1px; }
   .delta.neg { color: var(--danger); }
   .delta.pos { color: var(--accent); }
 
@@ -319,13 +411,11 @@
 
   .star {
     font-size: 9px; background: rgba(245,158,11,0.2); color: #f59e0b;
-    border-radius: 4px; padding: 2px 5px; font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    border-radius: 4px; padding: 2px 5px; font-family: 'Courier New', monospace;
     letter-spacing: 1px; vertical-align: middle; margin-left: 4px;
   }
 
-  .custom-row-input-wrap {
-    display: flex; align-items: center; gap: 6px;
-  }
+  .custom-row-input-wrap { display: flex; align-items: center; gap: 6px; }
 
   .custom-pct-input {
     background: transparent !important;
@@ -345,7 +435,7 @@
   }
   .custom-pct-input::-webkit-outer-spin-button,
   .custom-pct-input::-webkit-inner-spin-button { -webkit-appearance: none; }
-  .custom-pct-input::placeholder { color: var(--muted); font-size: 16px; font-family: 'Courier New', 'Courier', ui-monospace, monospace; }
+  .custom-pct-input::placeholder { color: var(--muted); font-size: 16px; font-family: 'Courier New', monospace; }
 
   .breakdown {
     background: #060a0e;
@@ -361,7 +451,7 @@
   }
 
   .breakdown-title {
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    font-family: 'Courier New', monospace;
     font-size: 10px; letter-spacing: 2px; color: var(--label);
     text-transform: uppercase; margin-bottom: 10px; font-weight: 700;
     text-shadow: 0 0 10px rgba(0,229,160,0.25);
@@ -371,15 +461,14 @@
     display: flex; justify-content: space-between; align-items: center;
     padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
   }
-  .breakdown-row:last-child { border-bottom: none; }
 
   .breakdown-row .bl {
-    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+    font-family: -apple-system, Arial, sans-serif;
     font-size: 14px; color: #00ffb3; font-weight: 500;
   }
 
   .breakdown-row .bv {
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    font-family: 'Courier New', monospace;
     font-size: 15px; font-weight: 700;
   }
 
@@ -388,7 +477,7 @@
     border: 1px solid rgba(0,229,160,0.08);
     border-radius: 8px; padding: 9px 11px;
     margin: 9px 0 5px;
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace;
+    font-family: 'Courier New', monospace;
     font-size: 11px; color: #00d68f; line-height: 1.8;
     white-space: pre;
   }
@@ -399,17 +488,16 @@
     border-top: 1px solid rgba(255,255,255,0.08);
   }
   .breakdown-total .bl {
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace; font-size: 11px;
+    font-family: 'Courier New', monospace; font-size: 11px;
     letter-spacing: 1px; color: var(--label); text-transform: uppercase; font-weight: 700;
-    text-shadow: 0 0 10px rgba(0,229,160,0.25);
   }
   .breakdown-total .bv {
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace; font-size: 22px; font-weight: 700;
+    font-family: 'Courier New', monospace; font-size: 22px; font-weight: 700;
   }
 
   .empty {
     text-align: center; padding: 20px 0 6px; color: var(--muted);
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace; font-size: 12px; letter-spacing: 1px;
+    font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 1px;
   }
   .empty-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.4; }
 
@@ -417,7 +505,7 @@
     width: 100%; margin-top: 12px;
     background: rgba(0,229,160,0.08); border: 1px solid rgba(0,229,160,0.28);
     border-radius: 10px; padding: 13px; color: var(--accent);
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace; font-size: 12px; letter-spacing: 2px;
+    font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 2px;
     cursor: pointer; transition: all 0.2s;
   }
   .copy-btn:hover { background: rgba(0,229,160,0.16); box-shadow: 0 0 18px rgba(0,229,160,0.14); }
@@ -426,7 +514,7 @@
     position: fixed; bottom: 22px; left: 50%;
     transform: translateX(-50%) translateY(20px);
     background: var(--accent); color: #000;
-    font-family: 'Courier New', 'Courier', ui-monospace, monospace; font-size: 12px; letter-spacing: 2px;
+    font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 2px;
     padding: 10px 22px; border-radius: 8px;
     opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap; z-index: 999;
   }
@@ -447,9 +535,10 @@
       <span class="field-label">Ask Price</span>
       <div class="input-wrap">
         <span class="prefix">$</span>
-        <input type="text" id="ask" placeholder="0" inputmode="decimal" autocomplete="off">
+        <input type="text" id="ask" placeholder="0.00" inputmode="decimal" autocomplete="off">
         <button class="clear-btn" onclick="clearField('ask')">✕</button>
       </div>
+      <div class="ask-real" id="askReal"></div>
     </div>
     <div class="field">
       <span class="field-label">Contratos</span>
@@ -461,23 +550,23 @@
   </div>
 
   <div class="controls-row">
-    <div class="commission-wrap">
+    <div class="commission-wrap" id="commWrap">
       <span class="comm-label">Comisión $2</span>
       <label class="comm-toggle">
-        <input type="checkbox" id="commToggle" onchange="calc()">
+        <input type="checkbox" id="commToggle" checked>
         <span class="comm-slider"></span>
       </label>
-      <span class="comm-label" id="commStatus" style="color:var(--muted); font-weight:400">OFF</span>
+      <span class="comm-label" id="commStatus" style="color:var(--accent); font-weight:700">ON</span>
     </div>
     <button class="reset-btn" onclick="resetAll()">↺ Reset</button>
   </div>
 
   <div class="total-badge" id="totalBadge" style="display:none">
     <div class="total-col">
-      <span class="total-label">Orden Total</span>
-      <span class="total-sub" id="totalSub">— contratos · — acciones</span>
+      <span class="total-label">Capital invertido</span>
+      <span class="total-sub" id="totalSub"></span>
     </div>
-    <span class="total-value" id="totalVal">$0.00</span>
+    <span class="total-value" id="totalVal">$0</span>
   </div>
 
   <hr class="divider">
@@ -491,6 +580,22 @@
   </div>
 
   <button class="copy-btn" id="copyBtn" style="display:none" onclick="copyResults()">⎘ &nbsp;Copiar al clipboard</button>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="dialog-overlay" id="dialogOverlay">
+  <div class="dialog">
+    <div class="dialog-icon">⚠️</div>
+    <div class="dialog-title">¿Desactivar comisión?</div>
+    <div class="dialog-msg">
+      La comisión de <strong>$2</strong> está incluida en el cálculo por defecto.<br><br>
+      ¿Estás seguro que quieres quitarla?
+    </div>
+    <div class="dialog-btns">
+      <button class="btn-cancel" onclick="cancelDialog()">No, mantener</button>
+      <button class="btn-confirm" onclick="confirmDialog()">Sí, quitar</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast">¡Copiado!</div>
@@ -516,79 +621,118 @@
   let selectedPct  = null;
   let customPctVal = null;
 
-  function ceilCents(v)  { return Math.ceil(v  * 100) / 100; }
-  function floorCents(v) { return Math.floor(v * 100) / 100; }
-  function fmt2(v)       { return v.toFixed(2); }
+  // ── COMMISSION TOGGLE WITH CONFIRMATION ─────
+  const commToggle  = document.getElementById('commToggle');
+  const commStatus  = document.getElementById('commStatus');
+  const commWrap    = document.getElementById('commWrap');
+  const dialogOverlay = document.getElementById('dialogOverlay');
+
+  // Intercept the toggle — if trying to turn OFF, show dialog first
+  commToggle.addEventListener('click', function(e) {
+    if (!this.checked) {
+      // User just clicked to turn it OFF → revert immediately and ask
+      this.checked = true;   // put it back ON visually
+      showDialog();
+      e.preventDefault();
+    } else {
+      // Turning back ON — just apply
+      applyCommStatus(true);
+    }
+  });
+
+  function showDialog() {
+    dialogOverlay.classList.add('show');
+  }
+
+  function cancelDialog() {
+    // Keep commission ON
+    dialogOverlay.classList.remove('show');
+    commToggle.checked = true;
+    applyCommStatus(true);
+  }
+
+  function confirmDialog() {
+    // User confirmed: turn OFF
+    dialogOverlay.classList.remove('show');
+    commToggle.checked = false;
+    applyCommStatus(false);
+  }
+
+  // Close dialog if clicking outside
+  dialogOverlay.addEventListener('click', function(e) {
+    if (e.target === dialogOverlay) cancelDialog();
+  });
+
+  function applyCommStatus(on) {
+    commStatus.textContent   = on ? 'ON' : 'OFF';
+    commStatus.style.color   = on ? 'var(--accent)' : 'var(--danger)';
+    commStatus.style.fontWeight = on ? '700' : '400';
+    commWrap.classList.toggle('comm-off', !on);
+    renderResults();
+  }
+
+  // ── FORMULA ─────────────────────────────────
+  function fmt2(v)  { return v.toFixed(2); }
   function fmtUSD(v) {
     const abs = Math.abs(v);
     return (v < 0 ? '−' : '+') + '$' + abs.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
   }
 
-  function computeLevel(ask, contracts, pct, withComm) {
-    // ask ingresado como precio de opción: 1.37 = $137 real
-    const askReal     = ask * 100;                    // 1.37 → 137
+  function computeLevel(askInput, contracts, pct, withComm) {
+    const realPrice   = Math.round(askInput * 100);
     const totalShares = contracts * 100;
-    const invested    = ask * totalShares;
-    const isTP        = pct > 0;
-    const comm        = withComm ? 2.00 : 0;
+    const invested    = realPrice * totalShares;
+    const comm        = withComm ? 2 : 0;
+    const isTP        = pct >= 0;
 
-    // Fórmula: ceil(askReal × multiplier) + $2 comm → ÷100 = precio de venta
-    const rawDollars  = askReal * (1 + pct / 100);
-    const roundedDollars = isTP ? Math.ceil(rawDollars) : Math.floor(rawDollars);
-    const totalDollars   = roundedDollars + (isTP ? comm : 0);
-    const rawPrice    = rawDollars / 100;
-    const finalPrice  = totalDollars / 100;
+    const rawSell   = isTP
+      ? realPrice * (1 + pct / 100) + comm
+      : realPrice * (1 + pct / 100) - comm;
 
-    const grossPnL    = (finalPrice - ask) * totalShares;
-    const netPnL      = grossPnL - (isTP ? comm : 0);
+    const finalSell   = isTP ? Math.ceil(rawSell) : Math.floor(rawSell);
+    const displaySell = finalSell / 100;
+    const netPnL      = (finalSell - realPrice) * totalShares;
     const totalReturn = invested + netPnL;
-    return { finalPrice, grossPnL, netPnL, totalReturn, invested, totalShares, rawPrice, askReal, comm };
+
+    return { realPrice, rawSell, finalSell, displaySell, netPnL, totalReturn, invested, totalShares, comm };
   }
 
+  // ── INPUTS ──────────────────────────────────
   const askEl       = document.getElementById('ask');
   const contractsEl = document.getElementById('contracts');
 
-  askEl.addEventListener('keydown', function(e) {
-    if (this.value === '' && e.key === '0') {
-      e.preventDefault(); this.value = '0.'; calc();
-    }
-  });
   askEl.addEventListener('input', function() {
     let v = this.value.replace(/[^0-9.]/g, '');
-    const p = v.split('.');
-    if (p.length > 2) v = p[0] + '.' + p.slice(1).join('');
+    const parts = v.split('.');
+    if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
     if (this.value !== v) this.value = v;
-    calc();
+    const num = parseFloat(v);
+    document.getElementById('askReal').textContent =
+      num > 0 ? `= $${Math.round(num * 100)} precio real` : '';
+    renderResults();
   });
-  contractsEl.addEventListener('input', calc);
 
-  function clearField(id) { document.getElementById(id).value = ''; calc(); }
+  contractsEl.addEventListener('input', renderResults);
+
+  function clearField(id) {
+    document.getElementById(id).value = '';
+    if (id === 'ask') document.getElementById('askReal').textContent = '';
+    renderResults();
+  }
 
   function resetAll() {
-    askEl.value = ''; contractsEl.value = '';
-    document.getElementById('commToggle').checked = false;
-    document.getElementById('commStatus').textContent = 'OFF';
-    document.getElementById('commStatus').style.color = 'var(--muted)';
-    document.getElementById('commStatus').style.fontWeight = '400';
+    askEl.value = '';
+    contractsEl.value = '';
+    document.getElementById('askReal').textContent = '';
+    commToggle.checked = true;
+    applyCommStatus(true);
     selectedPct = null; customPctVal = null;
-    calc();
+    renderResults();
   }
 
   function toggleSelect(pct) {
     selectedPct = (selectedPct === pct) ? null : pct;
     renderResults();
-  }
-
-  function toggleCustom() {
-    if (selectedPct === 'custom') { selectedPct = null; }
-    else { selectedPct = 'custom'; }
-    renderResults();
-    if (selectedPct === 'custom') {
-      setTimeout(() => {
-        const el = document.getElementById('customPctInput');
-        if (el) el.focus();
-      }, 50);
-    }
   }
 
   function onCustomInput(e) {
@@ -607,37 +751,18 @@
       const ci = document.getElementById('customPctInput');
       if (ci) {
         ci.focus();
-        const l = v.length;
-        try { ci.setSelectionRange(l, l); } catch(err) {}
+        try { ci.setSelectionRange(v.length, v.length); } catch(err) {}
       }
     });
   }
 
-  function updateCustomDisplay() {
-    const ask       = parseFloat(askEl.value);
-    const contracts = parseInt(contractsEl.value);
-    const withComm  = document.getElementById('commToggle').checked;
-    if (customPctVal && customPctVal > 0 && ask > 0 && contracts > 0) {
-      selectedPct = 'custom';
-      renderResults();
-    }
-  }
-
-  function calc() {
-    const tog = document.getElementById('commToggle');
-    const st  = document.getElementById('commStatus');
-    st.textContent    = tog.checked ? 'ON' : 'OFF';
-    st.style.color    = tog.checked ? 'var(--accent)' : 'var(--muted)';
-    st.style.fontWeight = tog.checked ? '700' : '400';
-    renderResults();
-  }
-
+  // ── RENDER ───────────────────────────────────
   function renderResults() {
-    const ask       = parseFloat(askEl.value);
+    const askInput  = parseFloat(askEl.value);
     const contracts = parseInt(contractsEl.value);
-    const withComm  = document.getElementById('commToggle').checked;
+    const withComm  = commToggle.checked;
 
-    if (!ask || !contracts || ask <= 0 || contracts < 1) {
+    if (!askInput || !contracts || askInput <= 0 || contracts < 1) {
       document.getElementById('totalBadge').style.display = 'none';
       document.getElementById('copyBtn').style.display    = 'none';
       document.getElementById('results').innerHTML =
@@ -645,16 +770,17 @@
       return;
     }
 
+    const realPrice   = Math.round(askInput * 100);
     const totalShares = contracts * 100;
-    const invested    = ask * totalShares;
+    const invested    = realPrice * totalShares;
 
     document.getElementById('totalBadge').style.display = 'flex';
     document.getElementById('totalVal').textContent =
-      '$' + invested.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+      '$' + invested.toLocaleString('en-US');
     document.getElementById('totalSub').textContent =
-      `${contracts} contrato${contracts>1?'s':''} · ${totalShares} acciones`;
+      `${contracts} contrato${contracts>1?'s':''} · ${totalShares} acciones · precio real $${realPrice}`;
 
-    const SL    = computeLevel(ask, contracts, -10, withComm);
+    const SL    = computeLevel(askInput, contracts, -10, withComm);
     const slSel = selectedPct === -10;
     let html = `
       <div class="sl-row ${slSel ? 'selected' : ''}" onclick="toggleSelect(-10)">
@@ -663,32 +789,33 @@
           <div class="sl-sub">−10%</div>
         </div>
         <div>
-          <div class="bid-price">$${fmt2(SL.finalPrice)}</div>
+          <div class="bid-price">$${fmt2(SL.displaySell)}</div>
           <div class="delta neg">${fmtUSD(SL.netPnL)}</div>
         </div>
       </div>`;
-    if (slSel) html += buildBreakdown(ask, contracts, -10, SL, withComm, '#ff4060');
+    if (slSel) html += buildBreakdown(askInput, contracts, -10, SL, withComm, '#ff4060');
 
     PRESET_LEVELS.forEach(lvl => {
-      const R     = computeLevel(ask, contracts, lvl.pct, withComm);
+      const R     = computeLevel(askInput, contracts, lvl.pct, withComm);
       const isSel = selectedPct === lvl.pct;
       html += `
         <div class="target-row ${lvl.cls} ${isSel ? 'selected' : ''}" onclick="toggleSelect(${lvl.pct})">
-          <div class="pct-tag">${lvl.pct}%${lvl.star ? '<span class=\"star\">TARGET</span>' : ''}</div>
+          <div class="pct-tag">${lvl.pct}%${lvl.star ? '<span class="star">TARGET</span>' : ''}</div>
           <div>
-            <div class="bid-price">$${fmt2(R.finalPrice)}</div>
+            <div class="bid-price">$${fmt2(R.displaySell)}</div>
             <div class="delta pos">${fmtUSD(R.netPnL)}</div>
           </div>
         </div>`;
-      if (isSel) html += buildBreakdown(ask, contracts, lvl.pct, R, withComm, COLOR_MAP[lvl.cls]);
+      if (isSel) html += buildBreakdown(askInput, contracts, lvl.pct, R, withComm, COLOR_MAP[lvl.cls]);
     });
 
     const customSel = selectedPct === 'custom';
     const customR   = (customPctVal && customPctVal > 0)
-      ? computeLevel(ask, contracts, customPctVal, withComm) : null;
+      ? computeLevel(askInput, contracts, customPctVal, withComm) : null;
 
     html += `
-      <div class="target-row tcustom ${customSel ? 'selected' : ''}" onclick="event.stopPropagation(); if(selectedPct!=='custom'){selectedPct='custom';renderResults();}">
+      <div class="target-row tcustom ${customSel ? 'selected' : ''}"
+           onclick="event.stopPropagation(); if(selectedPct!=='custom'){selectedPct='custom';renderResults();}">
         <div class="custom-row-input-wrap" onclick="event.stopPropagation()">
           <input type="text" id="customPctInput" class="custom-pct-input" inputmode="decimal"
             placeholder="??" value="${customPctVal || ''}"
@@ -699,14 +826,14 @@
         </div>
         <div>
           ${customR
-            ? `<div class="bid-price">$${fmt2(customR.finalPrice)}</div><div class="delta pos">${fmtUSD(customR.netPnL)}</div>`
+            ? `<div class="bid-price">$${fmt2(customR.displaySell)}</div><div class="delta pos">${fmtUSD(customR.netPnL)}</div>`
             : `<div style="font-family:'Courier New',monospace;font-size:11px;color:var(--muted);">escribe %</div>`
           }
         </div>
       </div>`;
 
     if (customSel && customR) {
-      html += buildBreakdown(ask, contracts, customPctVal, customR, withComm, COLOR_MAP['custom'] || 'var(--accent)');
+      html += buildBreakdown(askInput, contracts, customPctVal, customR, withComm, COLOR_MAP['custom']);
     }
 
     document.getElementById('results').innerHTML = html;
@@ -715,37 +842,38 @@
     const ci = document.getElementById('customPctInput');
     if (ci && selectedPct === 'custom') {
       ci.focus();
-      const len = ci.value.length;
-      try { ci.setSelectionRange(len, len); } catch(e) {}
+      try { ci.setSelectionRange(ci.value.length, ci.value.length); } catch(e) {}
     }
   }
 
-  function buildBreakdown(ask, contracts, pct, R, withComm, color) {
-    const roundRule  = pct > 0 ? 'Ceil ↑ (siempre arriba)' : 'Floor ↓ (stop loss)';
-    const isTP       = pct > 0;
-    const commLine   = (withComm && isTP)
-      ? `<div class="breakdown-row">
-           <span class="bl">+ Comisión broker</span>
-           <span class="bv" style="color:#7a9fba">+$2.00</span>
-         </div>` : '';
-    const askReal    = ask * 100;
-    const rawResult  = askReal * (1 + pct / 100);
-    const rounded    = isTP ? Math.ceil(rawResult) : Math.floor(rawResult);
-    const withCom    = rounded + (isTP && withComm ? 2.00 : 0);
-    const formulaTxt = isTP
-      ? `$${fmt2(ask)} × 100 = $${askReal.toFixed(0)}\n$${askReal.toFixed(0)} × ${(1 + pct/100).toFixed(2)} = $${rawResult.toFixed(2)} → ceil → $${rounded}\n${withComm ? `$${rounded} + $2.00 comisión = $${withCom}\n` : ''}$${withCom} ÷ 100 = $${fmt2(R.finalPrice)}`
-      : `$${fmt2(ask)} × 100 = $${askReal.toFixed(0)}\n$${askReal.toFixed(0)} × ${(1 + pct/100).toFixed(2)} = $${rawResult.toFixed(2)} → floor → $${rounded}\n$${rounded} ÷ 100 = $${fmt2(R.finalPrice)}`;
+  function buildBreakdown(askInput, contracts, pct, R, withComm, color) {
+    const isTP    = pct >= 0;
+    const comm    = withComm ? 2 : 0;
+    const commTxt = withComm
+      ? (isTP ? `+ $${comm} comisión` : `− $${comm} comisión`)
+      : '(sin comisión)';
+
+    const formulaTxt =
+`Ask:          $${askInput} × 100 = $${R.realPrice}
+Venta bruta:  $${R.realPrice} × (1 ${pct>=0?'+':'-'} ${Math.abs(pct)}/100) = $${(R.realPrice*(1+pct/100)).toFixed(4)}
+${isTP?'+ comisión:':'- comisión:'}   ${commTxt} → $${R.rawSell.toFixed(4)}
+Redondeo:     ${isTP ? 'ceil ↑' : 'floor ↓'} → $${R.finalSell}
+Precio venta: $${R.finalSell} ÷ 100 = $${fmt2(R.displaySell)}`;
 
     return `
       <div class="breakdown">
-        <div class="breakdown-title">📊 Desglose · ${pct > 0 ? '+' : ''}${pct}%</div>
+        <div class="breakdown-title">📊 Desglose · ${pct >= 0 ? '+' : ''}${pct}%</div>
         <div class="breakdown-row">
           <span class="bl">Ask ingresado</span>
-          <span class="bv" style="color:#fff">$${fmt2(ask)}</span>
+          <span class="bv" style="color:#fff">$${askInput}</span>
         </div>
         <div class="breakdown-row">
-          <span class="bl">Valor real (×100)</span>
-          <span class="bv" style="color:#fff">$${askReal.toFixed(0)}</span>
+          <span class="bl">Precio real (×100)</span>
+          <span class="bv" style="color:#fff">$${R.realPrice}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="bl">Precio de venta</span>
+          <span class="bv" style="color:${color}">$${fmt2(R.displaySell)}</span>
         </div>
         <div class="breakdown-row">
           <span class="bl">Contratos → Acciones</span>
@@ -753,48 +881,44 @@
         </div>
         <div class="breakdown-row">
           <span class="bl">Capital invertido</span>
-          <span class="bv" style="color:#fff">$${R.invested.toFixed(2)}</span>
+          <span class="bv" style="color:#fff">$${R.invested.toLocaleString('en-US')}</span>
         </div>
-        ${commLine}
-        <div class="breakdown-row">
-          <span class="bl">Precio de venta</span>
-          <span class="bv" style="color:${color}">$${fmt2(R.finalPrice)}</span>
-        </div>
-        <div class="breakdown-formula">${formulaTxt}</div>
         <div class="breakdown-row">
           <span class="bl">Ganancia neta</span>
           <span class="bv" style="color:${color}">${fmtUSD(R.netPnL)}</span>
         </div>
+        <div class="breakdown-formula">${formulaTxt}</div>
         <div class="breakdown-total">
           <span class="bl">TOTAL EN CUENTA</span>
-          <span class="bv" style="color:${color}">$${R.totalReturn.toFixed(2)}</span>
+          <span class="bv" style="color:${color}">$${R.totalReturn.toLocaleString('en-US')}</span>
         </div>
       </div>`;
   }
 
   function copyResults() {
-    const ask       = parseFloat(askEl.value);
+    const askInput  = parseFloat(askEl.value);
     const contracts = parseInt(contractsEl.value);
-    const withComm  = document.getElementById('commToggle').checked;
-    if (!ask || !contracts) return;
+    const withComm  = commToggle.checked;
+    if (!askInput || !contracts) return;
 
-    const invested = ask * contracts * 100;
+    const realPrice = Math.round(askInput * 100);
+    const invested  = realPrice * contracts * 100;
     let text = `📊 RECOVERY SNIPER · TARGETS\n`;
-    text += `Ask: $${fmt2(ask)} | Contratos: ${contracts} | Total: $${invested.toFixed(0)}\n`;
-    if (withComm) text += `Comisión: $2.00\n`;
-    text += `${'─'.repeat(40)}\n`;
+    text += `Ask: $${askInput} → precio real $${realPrice} | Contratos: ${contracts} | Capital: $${invested.toLocaleString('en-US')}\n`;
+    text += withComm ? `Comisión $2 incluida\n` : `Sin comisión\n`;
+    text += `${'─'.repeat(44)}\n`;
 
-    const SL = computeLevel(ask, contracts, -10, withComm);
-    text += `🔴 SL −10%  $${fmt2(SL.finalPrice)}   (${fmtUSD(SL.netPnL)})\n`;
+    const SL = computeLevel(askInput, contracts, -10, withComm);
+    text += `🔴 SL  −10%   Vender a $${fmt2(SL.displaySell)}   (${fmtUSD(SL.netPnL)})\n`;
 
     PRESET_LEVELS.forEach(lvl => {
-      const R = computeLevel(ask, contracts, lvl.pct, withComm);
-      text += `🟢 ${String(lvl.pct+'%').padEnd(6)} $${fmt2(R.finalPrice)}   (${fmtUSD(R.netPnL)})\n`;
+      const R = computeLevel(askInput, contracts, lvl.pct, withComm);
+      text += `🟢 +${String(lvl.pct+'%').padEnd(5)}  Vender a $${fmt2(R.displaySell)}   (${fmtUSD(R.netPnL)})\n`;
     });
 
     if (customPctVal) {
-      const R = computeLevel(ask, contracts, customPctVal, withComm);
-      text += `🟡 ${String(customPctVal+'%').padEnd(6)} $${fmt2(R.finalPrice)}   (${fmtUSD(R.netPnL)}) [custom]\n`;
+      const R = computeLevel(askInput, contracts, customPctVal, withComm);
+      text += `🟡 +${customPctVal}%   Vender a $${fmt2(R.displaySell)}   (${fmtUSD(R.netPnL)}) [custom]\n`;
     }
 
     navigator.clipboard.writeText(text).then(() => {
