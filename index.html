@@ -226,7 +226,8 @@
       }, 50);
     }
   }
-function onCustomInput(e) {
+
+  function onCustomInput(e) {
     // Strip non-numeric chars except decimal
     let v = e.target.value.replace(/[^0-9.]/g, '');
     const p = v.split('.');
@@ -422,7 +423,7 @@ function onCustomInput(e) {
     text += `Ask: $${fmt2(ask)} | Contratos: ${contracts} | Total: $${invested.toFixed(0)}\n`;
     if (withComm) text += `Comisión: $2.00\n`;
     text += `${'─'.repeat(40)}\n`;
-               
+
     const SL = computeLevel(ask, contracts, -10, withComm);
     text += `🔴 SL −10%  $${fmt2(SL.finalPrice)}   (${fmtUSD(SL.netPnL)})\n`;
 
