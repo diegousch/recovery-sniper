@@ -587,6 +587,7 @@
 
   let selectedPct  = null;
   let customPctVal = null;
+  let customPctRaw = '';
 
   // ── FORMULA ─────────────────────────────────
   // realPrice  = ask × 100            (1.37 → 137)
@@ -695,7 +696,7 @@
     document.getElementById('askReal').textContent = '';
     commToggle.checked = true;
     applyCommStatus(true);
-    selectedPct = null; customPctVal = null;
+    selectedPct = null; customPctVal = null; customPctRaw = '';
     renderResults();
   }
 
@@ -705,22 +706,32 @@
   }
 
   function onCustomInput(e) {
-    let v = e.target.value.replace(/[^0-9.]/g, '');
-    const p = v.split('.');
-    if (p.length > 2) v = p[0] + '.' + p.slice(1).join('');
-    const cursorPos = e.target.selectionStart - (e.target.value.length - v.length);
+    let v = e.target.value;
+    // Allow: optional leading minus, digits, one decimal point
+    v = v.replace(/[^0-9.\-]/g, '');
+    // Minus only allowed at the start
+    const isNeg = v.startsWith('-');
+    let digits = v.replace(/-/g, '');
+    // Only one decimal point
+    const parts = digits.split('.');
+    if (parts.length > 2) digits = parts[0] + '.' + parts.slice(1).join('');
+    v = (isNeg ? '-' : '') + digits;
     if (e.target.value !== v) {
+      const cursorPos = Math.max(0, e.target.selectionStart - (e.target.value.length - v.length));
       e.target.value = v;
       try { e.target.setSelectionRange(cursorPos, cursorPos); } catch(err) {}
     }
-    customPctVal = parseFloat(v) || null;
+    customPctRaw = v;
+    const parsed = parseFloat(v);
+    customPctVal = (!isNaN(parsed) && v !== '' && v !== '-') ? parsed : null;
     selectedPct  = 'custom';
     renderResults();
     requestAnimationFrame(() => {
       const ci = document.getElementById('customPctInput');
       if (ci) {
+        ci.value = customPctRaw;
         ci.focus();
-        try { ci.setSelectionRange(v.length, v.length); } catch(err) {}
+        try { ci.setSelectionRange(customPctRaw.length, customPctRaw.length); } catch(err) {}
       }
     });
   }
@@ -779,7 +790,7 @@
     });
 
     const customSel = selectedPct === 'custom';
-    const customR   = (customPctVal && customPctVal > 0)
+    const customR   = (customPctVal !== null && customPctVal !== 0)
       ? computeLevel(askInput, contracts, customPctVal, withComm) : null;
 
     html += `
@@ -787,7 +798,7 @@
            onclick="event.stopPropagation(); if(selectedPct!=='custom'){selectedPct='custom';renderResults();}">
         <div class="custom-row-input-wrap" onclick="event.stopPropagation()">
           <input type="text" id="customPctInput" class="custom-pct-input" inputmode="decimal"
-            placeholder="??" value="${customPctVal || ''}"
+            placeholder="??" value="${customPctRaw}"
             oninput="onCustomInput(event)"
             onclick="event.stopPropagation(); if(selectedPct!=='custom'){selectedPct='custom';renderResults();}">
           <span style="font-family:'Impact','Arial Narrow',sans-serif;font-size:22px;color:var(--accent);">%</span>
@@ -881,7 +892,7 @@ Bid venta:  $${R.finalSell} ÷ 100 = $${fmt2(R.displaySell)}`;
       text += `🟢 +${String(lvl.pct+'%').padEnd(5)}  Vender a $${fmt2(R.displaySell)}   (${fmtUSD(R.netPnL)})\n`;
     });
 
-    if (customPctVal) {
+    if (customPctVal !== null && customPctVal !== 0) {
       const R = computeLevel(askInput, contracts, customPctVal, withComm);
       text += `🟡 +${customPctVal}%   Vender a $${fmt2(R.displaySell)}   (${fmtUSD(R.netPnL)}) [custom]\n`;
     }
